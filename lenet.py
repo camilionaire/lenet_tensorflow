@@ -1,15 +1,22 @@
 
+# tensorflow and keras for making the model
+from os import sep
+from numpy import expand_dims
 import tensorflow as tf
 from tensorflow.keras import datasets, layers, models
+# this so we can plot that data afterwards
 import matplotlib.pyplot as plt
 
-LEARNING = 0.001
-ACTIVATION = 'relu'
+# this is so I can change the output of the model
+from keras.models import Model
+
+LEARNING = 0.1
+ACTIVATION = 'sigmoid'
 BATCH = 10
 OPTI = 'sgd'
-EPOCHS = 100
+EPOCHS = 50
 LOSSY = 'cross'
-KERNEL = 3
+KERNEL = 5
 
 # downloads the cifar10 dataset
 (train_images, train_labels), (test_images, test_labels) = \
@@ -42,6 +49,8 @@ print('Batch Size: ', BATCH)
 print('Optimizer: ', OPTI)
 print('Epochs: ', EPOCHS)
 print(f'Kernel size: {KERNEL}x{KERNEL}')
+
+print("third layer is: ", model.layers[2].name)
 
 adam = tf.keras.optimizers.Adam(learning_rate=LEARNING)
 sgd = tf.keras.optimizers.SGD(learning_rate=LEARNING)
@@ -89,6 +98,52 @@ ax2.grid(visible=True)
 ax2.legend(loc='upper right')
 plt.show()
 
+# this just runs the testing info through the finalized model.
 test_loss, test_acc = model.evaluate(test_images, test_labels, verbose=2)
-
+# prints it
 print(test_acc)
+
+################################################################################
+# This is all stuff to print out the feature maps.
+model = Model(inputs=model.inputs, outputs=model.layers[2].output)
+
+# first 10 test images... I think, we'll see...
+# this is just the size of the images?...
+plt.figure(figsize=(10, 10))
+for i in range(10):
+    plt.subplot(2, 5, i+1)
+    plt.xticks([])
+    plt.yticks([])
+    plt.grid(False)
+    plt.imshow(train_images[i])
+
+    # CIFAR labels are arrays,
+    # which is why you need the extra index.
+    plt.xlabel(class_names[train_labels[i][0]])
+plt.savefig('features/before.png')
+plt.show()
+
+
+for index in range(0, 10):
+    # first 0 is the index, second zero is there for something else...
+    print("I am trying to do the feature maps of a", class_names[train_labels[index][0]])
+    img = expand_dims(train_images[index], axis=0)
+    feature_maps = model.predict(img)
+    # plot all 16 maps in a 4x4 square of squares
+    square = 4
+    ix = 1
+    for _ in range(square):
+        for _ in range(square):
+            # specify subplot and turn off axis
+            ax = plt.subplot(square, square, ix)
+            ax.set_xticks([])
+            ax.set_yticks([])
+            # plot filter channel in grayscale
+            plt.imshow(feature_maps[0, :, :, ix-1])#, cmap='gray')
+            ix += 1
+    # can change the first 0 to i... 
+    plt.suptitle(class_names[train_labels[index][0]])
+    # might save the figure to the spot... can change 0 with i
+    plt.savefig('features/'+ str(index) + '.png')
+# show the figure... if it works :-\
+# plt.show()
