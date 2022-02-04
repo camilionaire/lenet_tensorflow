@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 LEARNING = 0.001
 ACTIVATION = 'relu'
 BATCH = 10
-OPTI = 'sgd'
-EPOCHS = 10
+OPTI = 'adam'
+EPOCHS = 50
 LOSSY = 'cross'
 KERNEL = 3
 
@@ -22,18 +22,20 @@ class_names = ['airplane', 'automobile', 'bird', 'cat', \
      'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
 
 superModel = models.Sequential([
-    layers.Conv2D(6, (KERNEL, KERNEL), activation=ACTIVATION, padding='same', input_shape=(32, 32, 3)),
+    layers.Conv2D(16, (KERNEL, KERNEL), activation=ACTIVATION, padding='same', input_shape=(32, 32, 3)),
     layers.AveragePooling2D((2, 2), strides=(1, 1)),
     layers.Conv2D(16, (KERNEL, KERNEL), activation=ACTIVATION, padding='same'),
     layers.AveragePooling2D((2, 2), strides=(1, 1)),
     layers.Conv2D(16, (KERNEL, KERNEL), activation=ACTIVATION, padding='same'),
     layers.AveragePooling2D((2, 2), strides=(1, 1)),
-    layers.Conv2D(16, (KERNEL, KERNEL), activation=ACTIVATION, padding='same'),
+    layers.Conv2D(32, (KERNEL, KERNEL), activation=ACTIVATION, padding='same'),
     layers.AveragePooling2D((2, 2), strides=(1, 1)),
-    layers.Conv2D(16, (KERNEL, KERNEL), activation=ACTIVATION, padding='same'),
+    layers.Conv2D(32, (KERNEL, KERNEL), activation=ACTIVATION, padding='same'),
     layers.AveragePooling2D((2, 2), strides=(1, 1)),
     
     layers.Flatten(),
+    # layers.Dense(4096, activation=ACTIVATION),
+    # layers.Dense(512, activation=ACTIVATION),
     layers.Dense(120, activation=ACTIVATION),
     layers.Dense(84, activation=ACTIVATION),
     layers.Dense(10),
